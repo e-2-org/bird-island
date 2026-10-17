@@ -1,6 +1,6 @@
 # Bird Island fixes - session transcript
 
-Transcript of a Claude Code session on 17 October 2026. Tool calls are shown as one-line notes; their output is omitted, except where a screenshot was looked at. Message times weren't recorded, so only the date is given. A summary of the session is in [2026-10-17-summary.md](2026-10-17-summary.md).
+Transcript of a Claude Code session on 17 October 2026. Tool calls are shown as one-line notes; their output is omitted, except where a screenshot was looked at. Message times weren't recorded, so only the date is given. A summary of the session is in [summary.md](summary.md).
 
 ---
 

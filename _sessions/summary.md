@@ -1,6 +1,6 @@
 # Bird Island fixes: session summary
 
-17 October 2026, working with Claude Code on the `html-port` branch. The changes were committed as `0e6a312` ("Went through site with Claude Code fixing errors"). The full conversation is in [2026-10-17-transcript.md](2026-10-17-transcript.md).
+17 October 2026, working with Claude Code on the `html-port` branch. The changes were committed as `0e6a312` ("Went through site with Claude Code fixing errors"). The full conversation is in [transcript.md](transcript.md).
 
 ## Where things stood
 
