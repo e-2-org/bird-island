@@ -1,6 +1,6 @@
 # Bird Island fixes: session summary
 
-17 October 2026, working with Claude Code on the `html-port` branch. The changes were committed as `0e6a312` ("Went through site with Claude Code fixing errors"). The full conversation is in [transcript.md](transcript.md).
+17 October 2026, working with Claude Code. The fixes were made on the `html-port` branch and committed as `0e6a312` ("Went through site with Claude Code fixing errors"). Later in the session that branch was merged into `docs/` on `main` (`d9aa196`) and deleted, so the files named below are now in `docs/`. The rest of the session set up how session logs and publishing work across all the `e-2-org` repos; see [Later in the session](#later-in-the-session-session-logs-and-publishing). The full conversation is in [transcript.md](transcript.md).
 
 ## Where things stood
 
@@ -55,3 +55,35 @@ These are all still in git history.
 - **The design itself.** The tiny `size="1"` text, headings and menu items drawn as images, and the fixed 760px width are the weakest points for accessibility, but changing them would change the artwork. No viewport meta tag was added, because phones display a fixed-width page like this better when they zoom out to fit it.
 - **Unfinished drafts.** `island/ibis.html`, `island/vireo.html` and `island/solitaire.html` aren't linked from anywhere and reuse other beaches' photos. `img/island_view.html` is an earlier version of the beach map with five hotspots. About 60 images in `img/` are unused, including one with a space in its name (`land survey.gif`). These were kept for the archive.
 - `robots.txt` and `.htaccess` are empty files, which does no harm.
+
+## Later in the session: session logs and publishing
+
+After the fixes, the session moved on to conventions for all 13 repos under the `e-2-org` GitHub organisation: 7actsoflove, adelaide, ahouse, bird-island, contact, c-ship, e-2, error404, minus20, nowhere, pigstails, tome and wordperhect.
+
+### Session logs
+
+- Each project keeps one `_sessions/summary.md` and one `_sessions/transcript.md`, which are updated after each session. The leading underscore keeps the folder off sites published with GitHub Pages. The `log-session` skill (`~/.claude/skills/log-session/`) now says this.
+- A `SessionStart` hook in `~/.claude/settings.json` runs `~/.claude/hooks/session-summary.sh`, which adds the project's `_sessions/summary.md` to Claude's context at the start of each session, so earlier work is known without being asked.
+- The dated session files in 12 repos were renamed to `summary.md` and `transcript.md`. Where a repo had two sessions (wordperhect, c-ship), they were merged into one pair, oldest first. Where one file held both summary and transcript (7actsoflove, contact), it was split. identifier-service, a work project outside `e-2-org`, was left as it was.
+
+### Publishing convention
+
+Recorded in `~/.claude/CLAUDE.md`, which applies only to `e-2-org` repos:
+
+- Every repo is published by GitHub Pages from `main`, `/docs`, with no Actions workflow. The original artwork stays untouched at the repo root, with the README, build scripts and `_sessions/`; none of that is published.
+- `docs/` is either a Jekyll site (`docs/_config.yml`) or a static site (`docs/.nojekyll`).
+- Private repos are laid out the same way, but are only made public, and Pages switched on, when the user asks, after checking with the artists.
+- The file includes the steps for moving a repo to this layout and for switching a live site over without downtime.
+
+### What was done to the repos
+
+- **Private repos** (bird-island, adelaide, ahouse, tome, minus20, nowhere, pigstails, c-ship, wordperhect): each port branch was merged into `docs/` on `main` with a subtree merge, which keeps the branch's history. Build scripts moved to the root and now point at `docs/`. tome got a `docs/index.html` that redirects to `tome.html`. wordperhect's `port/` folder became `docs/`; its 31 tests pass before and after. FTP logs were left out of `docs/`. These repos are private with Pages off, so nothing was published.
+- **Public repos** (7actsoflove, contact, e-2, error404): moved to `main`, `/docs` and switched over live. Every URL on each site was fetched before and after the switch: all were unchanged, except that error404 no longer publishes `LICENSE.md`, which nothing linked to.
+- **Bird-island specifically:** `main` now has the original site at the root and the fixed version in `docs/`. The repo is private and has no Pages site, so the site isn't public yet.
+- **Tidying:** every port branch and old `master` branch was deleted, locally and on GitHub, once it was fully contained in the pushed `main`. Old stashes and leftover build folders were deleted. All 13 repos now have only `main`.
+
+### Lessons recorded in `CLAUDE.md`
+
+- Changing a repo's Pages source doesn't start a build; one has to be requested (`gh api -X POST repos/e-2-org/<repo>/pages/builds`).
+- Pushing the branch that is still being published starts its own deployment, which blocks the deployment from `main`. Push `main` first, switch and build, and push the old branch afterwards.
+- For a repo already published from the root of `main`, switch the source to `/docs` before pushing, so the root is never published.

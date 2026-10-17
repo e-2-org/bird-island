@@ -1,6 +1,6 @@
 # Bird Island fixes - session transcript
 
-Transcript of a Claude Code session on 17 October 2026. Tool calls are shown as one-line notes; their output is omitted, except where a screenshot was looked at. Message times weren't recorded, so only the date is given. A summary of the session is in [summary.md](summary.md).
+Transcript of a Claude Code session on 17 October 2026. Tool calls are shown as one-line notes; their output is omitted, except where a screenshot was looked at. Message times weren't recorded, so only the date is given. From the move to `_sessions/` onwards, the session covers all the `e-2-org` repos; there, Claude's longer replies are shortened where they repeat what the summary records, and runs of similar tool calls are grouped. A summary of the session is in [summary.md](summary.md).
 
 ---
 
@@ -178,3 +178,419 @@ Bird Island isn't a Jekyll site, so the skill wants a `sessions/` folder. I'll m
 > *Bash: Rename session folder to sessions*
 
 > *Edit: sessions/2026-10-17-transcript.md*
+
+The files moved to `sessions/`, and the transcript was brought up to date. Claude noted that the other markdown-lint warnings come from the transcript format the other repos use, and left them.
+
+---
+
+## User
+
+will sessions be read when you are asked to do additional work on a project?
+
+## Claude
+
+> *Bash: Check for CLAUDE.md files that mention session logs*
+
+No, not automatically. Claude Code loads `CLAUDE.md` files and its own memory notes, but a `sessions/` folder is only read if Claude comes across it or is pointed to it. None of the art repos had a `CLAUDE.md`. Claude suggested a short `CLAUDE.md` in each repo that imports the summary with an `@sessions/...` line (but not the transcripts, which are long), and offered to add one.
+
+---
+
+## User
+
+Does this have to be done for each one, or is it something I can set globally?
+
+## Claude
+
+It can be set once. Three ways: an instruction in `~/.claude/CLAUDE.md` (relies on Claude following it), a `CLAUDE.md` in the folder above all the repos (same effect, limited to that folder), or a `SessionStart` hook that prints the newest summary into context (doesn't depend on Claude remembering). Claude recommended the hook.
+
+---
+
+## User
+
+Yes, please. I put in the skill that session summaries and transcripts are named with dates in the filenames unless they are additional sessions on the same project, but I've changed this skill and now I just want the two files named summary.md and transcript.md which are edited if they already exist
+
+## Claude
+
+> *Skill: update-config*
+
+> *Bash: Read updated skill and current user settings*
+
+> *Bash: Rename session files to summary.md and transcript.md and fix their links*
+
+> *Write: ~/.claude/hooks/session-summary.sh*
+
+> *Bash: Test the hook script against three repos*
+
+> *Edit: ~/.claude/settings.json (add the SessionStart hook, keeping the attribution settings)*
+
+> *Bash: Validate settings JSON with Python since jq is missing*
+
+The hook loads `sessions/summary.md` (or `_sessions/` in Jekyll sites), falling back to the newest dated summary for older logs. Tested on bird-island, error404 (old naming) and cookie-banner (no log). Bird-island's files were renamed to `summary.md` and `transcript.md`.
+
+---
+
+## User
+
+can you rename previous summaries and transcripts for other projects so they follow the new naming convention?
+
+## Claude
+
+> *Bash: Survey session folders and files across all repos*
+
+> *Bash: Inspect duplicate transcript, combined session files, and identifier-service layout*
+
+> *AskUserQuestion: how to handle identifier-service, and whether to rename non-Jekyll `_sessions/` folders to `sessions/`*
+
+The user chose to leave identifier-service as it is, and to rename the folders.
+
+> *Bash: Check publishing setup and references to session paths in each repo*
+
+> *Bash: Find dated-filename links and inspect files needing split or merge*
+
+> *Bash: Rename, merge, and split session files across repos*
+
+> *Bash: Verify renamed, merged and split session files*
+
+Session logs in 12 repos were renamed. wordperhect's two sessions were merged into one pair; 7actsoflove's and contact's combined files were split. Claude held off renaming `_sessions/` to `sessions/`: GitHub Pages runs Jekyll on repos without `.nojekyll`, and Jekyll leaves out folders starting with `_`, so the rename could publish the logs.
+
+---
+
+## User
+
+keep _sessions everywhere
+
+## Claude
+
+> *Bash: Check storyofart deploy workflow and whether bird-island sessions were pushed*
+
+> *Bash: Rename sessions folders to _sessions in bird-island and storyofart*
+
+> *Edit: log-session skill (always `_sessions/`; update existing files)*
+
+> *Edit: session-summary.sh (comments)*
+
+> *Bash: Re-test the hook against bird-island's new folder*
+
+Every project now uses `_sessions/`, and the skill and hook match.
+
+---
+
+## User
+
+I'm still working out a convention for publishing - some will be jekyll asnd just use GitHub pages on a branch (with a consistent name) and other static HTML projects will use GitHub actions to publish a branch (again with a consistent name)
+
+## Claude
+
+Jekyll sites published from a branch keep `_sessions/` private automatically. A GitHub Actions deploy doesn't run Jekyll, so it publishes whatever folder it uploads, `_sessions/` included, unless the workflow uploads a subfolder or filters files out. Claude sketched a workflow step that copies the site to `_site/` without `_sessions`, `.github` and the README.
+
+---
+
+## User
+
+OK - maybe if I estyablish a convention that either a project is a jekyll site or a static site with a build directory (called 'build') which is published?
+
+## Claude
+
+> *Bash: Check whether any gitignore already ignores a build folder*
+
+The two types are a good split, but 33 of the user's repos ignore `build/` (it's in GitHub's standard Python and Node `.gitignore` templates), so a site folder with that name could silently be left out of git. Claude suggested `docs/`: GitHub Pages can publish `/docs` from a branch with no workflow at all.
+
+---
+
+## User
+
+I love that there isa convention for docs in Github - this is definitely the way to go!
+
+## Claude
+
+> *AskUserQuestion: which branch Pages should publish from*
+
+The user chose `main`.
+
+> *Write: ~/.claude/CLAUDE.md (publishing convention)*
+
+---
+
+## User
+
+Yes please list them - I know some have used a separate branch for publishing, and I've kept the main branch with all the old stuff intact. Ideally the new branch would be merged into a docs folder somehow? and the rest of the main branch kept as it? The only repos I want to manage this way at the moment are the ones under the e-2-org organisation. other ones like the identifier service are part of my day job and need to be handled with more sensitivity
+
+## Claude
+
+> *Edit: ~/.claude/CLAUDE.md (only `e-2-org` repos)*
+
+> *Bash: List local repos whose origin is in the e-2-org organisation; fetch from GitHub*
+
+> *Bash: Survey branches and site layout of each e-2-org repo*
+
+> *Bash: Inspect main and port branch contents and non-session uncommitted changes*
+
+Claude listed the 13 repos with where each new version lives, and proposed a single rule: the original at the root of `main`, the new version in `docs/`, published from `main`, `/docs`, for Jekyll and static sites alike. A subtree merge (`git merge -s ours` then `git read-tree --prefix=docs/`) brings a branch into `docs/` while keeping its history.
+
+---
+
+## User
+
+Yes please - and I've loggerd in to github with gh
+
+## Claude
+
+> *Write: ~/.claude/CLAUDE.md (everything published from `main`, `/docs`)*
+
+> *Bash: Read bird-island's Pages settings; read visibility and Pages settings for each e-2-org repo*
+
+Only four repos were published (7actsoflove, contact, e-2, error404); the other nine, bird-island included, are private with no Pages site, so the session logs had never been public.
+
+> *Bash: Show bird-island status, branch graph, and README differences*
+
+> *Bash: List and summarise bird-island stashes*
+
+> *Bash: Commit session move, then merge html-port into docs/ on main*
+
+> *Bash: Commit the merge and verify root and docs contents*
+
+> *Bash: Verify root changes, links and rendering of docs/*
+
+Bird-island's `main` now has the original at the root and the `html-port` version in `docs/` (`d9aa196`), with pages from `docs/` rendering identically to the earlier screenshots. The organisation is on GitHub's free plan, so Pages needs a public repo.
+
+---
+
+## User
+
+Yes, some are still private while I contact the artists and see what they want to do. As long as the convention is in place for these repos so when they are made public they can publish in the same way that's great
+
+## Claude
+
+> *Edit: ~/.claude/CLAUDE.md (private repos: lay out the same way, never publish unless asked, the two commands to publish)*
+
+---
+
+## User
+
+OK lets go
+
+## Claude
+
+> *Bash: Check state, README differences and odd files in the eight private repos*
+
+> *Bash: Inspect tooling folders, PHP files and downloadable files in port branches; show README differences; see how build scripts and tests locate site files*
+
+> *Bash: Check c-ship Jekyll config and tome changes*
+
+> *Bash: Merge each port branch into docs/ on main (twice, after fixing two bugs in the script's `git rm` steps)*
+
+> *Bash: Point nowhere and pigstails build scripts at docs/*
+
+> *Write: tome/docs/index.html (redirect to tome.html)*
+
+> *Bash: Merge c-ship's two sessions into summary.md and transcript.md*
+
+> *Bash: Verify root and docs contents; compare broken links on port branches with docs/ copies*
+
+> *Bash: Commit the docs merges in the seven repos; build c-ship's Jekyll site from docs/*
+
+Seven private repos were merged into `docs/`. The port branches' READMEs became the root README, with a "Layout" section. No new broken links; c-ship builds from `docs/`. wordperhect was left out because its port branch's top-level `index.html` was still the Flash page.
+
+---
+
+## User
+
+wordperhect should open on port/index.html - do I rename the port directory to docs?
+
+## Claude
+
+> *Bash: Check whether wordperhect's port folder is self-contained and how tooling refers to it; list what html-port changed relative to main*
+
+Yes: `port/` only reaches outside itself for `../favicon.ico`, and `html-port` only adds files to `main`. Claude described the steps: merge, `git mv port docs`, and update the four places that refer to `port/`.
+
+---
+
+## User
+
+yes please
+
+## Claude
+
+> *Bash: Run the wordperhect test suite on html-port as a baseline (31 pass)*
+
+> *Bash: Start merging html-port into main and move port/ to docs/*
+
+> *Write: wordperhect/README.md (from port/README.md, paths updated)*
+
+> *Bash: Update paths from port/ to docs/ in the extractor, tests, page and comments*
+
+> *Bash: Run the wordperhect test suite against docs/ (31 pass)*
+
+> *Bash: Verify and commit the wordperhect merge*
+
+---
+
+## User
+
+where4 is the docs directory in 7actsoflove on the main branch?
+
+## Claude
+
+> *Bash: Check 7actsoflove's current branch and main contents*
+
+There wasn't one yet: 7actsoflove is one of the four public repos, left until its push and Pages switch could be done together.
+
+---
+
+## User
+
+yes please
+
+## Claude
+
+> *Bash: Check html-port state and Jekyll config; commit the session log split on html-port*
+
+> *Bash: Build the html-port Jekyll site as a reference; merge html-port into docs/ on main*
+
+> *Bash: Build from docs/ (pointing bundler at the existing gems) and compare: identical, 452 files*
+
+> *Bash: Move local gem folders into docs and commit the merge*
+
+Claude asked before pushing and switching Pages.
+
+---
+
+## User
+
+yes please
+
+## Claude
+
+> *Bash: Record the live site's responses before the switch (452 URLs, all 200)*
+
+> *Bash: Push main and html-port; switch Pages to main /docs*
+
+> *Bash (background): Wait for the Pages build of main*
+
+---
+
+## User
+
+OK
+
+## Claude
+
+The build was still running.
+
+---
+
+## User
+
+Github says it finished 3 minutes ago
+
+## Claude
+
+> *Bash: Check the latest Pages builds and runs*
+
+The finished build was the one triggered by pushing `html-port`; switching the source hadn't started a build from `main`, so the wait would never have finished.
+
+> *Bash: Request a GitHub Pages build of the new source; wait for it*
+
+> *Bash: Fetch the live site again and compare: all 452 URLs unchanged*
+
+> *Edit: ~/.claude/CLAUDE.md (go-live steps)*
+
+---
+
+## User
+
+Yes please
+
+## Claude
+
+> *Bash: Check state of contact, e-2 and error404*
+
+> *Bash: contact: commit session split, build reference, merge spa-port into docs/, compare builds (identical, 197 files), commit, save the live site*
+
+---
+
+## User
+
+Can you remove all the dangling local and remote git branches from these repos when you've finished with them please?
+
+## Claude
+
+Branches would be deleted only once all their commits are in `main` on GitHub, so the private repos' `main` would need pushing first.
+
+> *Bash: Push contact, switch Pages, request a build*
+
+> *Bash: e-2: commit session rename, build reference, merge jekyll into docs/, compare builds (identical, 93 files), commit*
+
+> *Bash: Show the error from the failed contact Pages build*
+
+The contact build from `main` failed at the deploy step, blocked by the deployment the `spa-port` push had started. The live site stayed up. A new build was requested and succeeded.
+
+> *Edit: ~/.claude/CLAUDE.md (push only `main` first; check the build's conclusion)*
+
+> *Bash: error404: commit session rename, move the site files into docs/, update script paths, build (identical apart from LICENSE.md), re-run the timeline extractor (unchanged), commit*
+
+> *Bash: Fetch the live contact site and compare: all 197 URLs unchanged*
+
+> *Bash: Delete merged branches in contact and 7actsoflove*
+
+> *Bash: e-2: save the live site, push main, switch Pages, build, compare: all 93 URLs unchanged; delete merged branches*
+
+> *Bash: error404: save the live site, switch Pages before pushing, push, build, compare: 180 of 181 unchanged (LICENSE.md no longer published); delete merged branches*
+
+> *Edit: ~/.claude/CLAUDE.md (repos already published from the root of `main`)*
+
+> *Bash: Check the private repos' branches against their local main*
+
+Claude asked before pushing the nine private repos' `main` branches.
+
+---
+
+## User
+
+yes please
+
+## Claude
+
+> *Bash: Push main in the nine private repos*
+
+> *Bash: Dry run, then delete merged port branches; list remaining branches in all repos*
+
+All 13 repos now have only `main`, locally and on GitHub.
+
+---
+
+## User
+
+I don't need the stashes - please delete them and remove the build folders and stuff
+
+## Claude
+
+> *Bash: List untracked and ignored files in all e-2-org repos; inspect error404's _vendor and output folders*
+
+> *Bash: Clear stashes and remove leftover build folders*
+
+Five stashes were cleared, and the old `_site/` folders, contact's `.jekyll-cache/` and two stale root `Gemfile.lock` files were removed. Kept: error404's `_old/` (the original piece, only on this machine), `output/` (the rendered videos) and `_vendor/` (reference stylesheets), and the dependencies needed for local builds and tests.
+
+---
+
+## User
+
+Nice and tidy!
+
+## Claude
+
+Bird-island's session log only covered the start of the session; Claude offered to add the rest.
+
+---
+
+## User
+
+yes please
+
+## Claude
+
+> *Skill: log-session*
+
+> *Bash: Read the start and end of bird-island's transcript*
+
+> *Edit: _sessions/summary.md and _sessions/transcript.md*
